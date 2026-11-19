@@ -6,9 +6,9 @@ Aplikasi sistem informasi sederhana berbasis PHP untuk mengelola konten admin de
 
 - **AES-256-GCM** mengenkripsi konten dan mendeteksi perubahan data.
 - Setiap konten memakai kunci AES acak tersendiri.
-- **RSA-2048 (OAEP)** mengenkripsi kunci AES; private key hanya digunakan server saat membuka konten.
-- Password admin disimpan dengan `password_hash()`, query menggunakan PDO prepared statements, dan formulir memakai token CSRF.
-- Buka bagian **“Lihat bukti data terenkripsi”** pada kartu konten di dashboard untuk menunjukkan ciphertext dan kunci AES terbungkus RSA yang tersimpan di database.
+- **RSA-2048 (OAEP)** mengenkripsi kunci AES. Halaman admin memerlukan private key yang cocok untuk membuka tampilan dan mengelola konten.
+- Halaman utama menampilkan semua konten dalam bentuk terbaca tanpa meminta key. Karena itu, isi database menjadi informasi publik bagi siapa pun yang mengakses situs.
+- Query database menggunakan PDO prepared statements dan formulir memakai token CSRF.
 
 ## Persiapan
 
@@ -21,13 +21,7 @@ Aplikasi sistem informasi sederhana berbasis PHP untuk mengelola konten admin de
    php scripts/generate_keys.php
    ```
 
-5. Buat akun admin. Jalankan perintah berikut di terminal dan masukkan username serta password minimal 12 karakter saat diminta:
-
-   ```sh
-   php scripts/create_admin.php
-   ```
-
-6. Jalankan server pengembangan dengan folder `public` sebagai document root:
+5. Jalankan server pengembangan dengan folder `public` sebagai document root:
 
    ```sh
    php -S 127.0.0.1:8000 -t public
@@ -35,9 +29,11 @@ Aplikasi sistem informasi sederhana berbasis PHP untuk mengelola konten admin de
 
    Buka `http://127.0.0.1:8000`. Pada Apache/Laragon, arahkan document root virtual host ke folder `public`; aturan `.htaccess` juga membatasi akses langsung ke folder internal.
 
-## Catatan kunci
+## Membuka konten dan catatan kunci
 
-Simpan `storage/keys/private.pem` sebagai rahasia dan buat cadangan di lokasi aman. Tanpa private key, konten lama tidak dapat didekripsi. Jangan menimpa atau membuat ulang pasangan kunci setelah konten disimpan.
+Saat membuka situs, halaman utama menampilkan konten dari database dalam bentuk terbaca. Gunakan tautan **Admin** untuk menuju halaman admin yang terkunci, lalu tombol kunci untuk membuka halaman input private key. Tempel seluruh isi `storage/keys/private.pem` di sana. Private key disimpan sementara di sesi server selama admin terbuka dan dihapus dari sesi saat dikunci atau sesi berakhir.
+
+Halaman utama mendekripsi konten otomatis di server agar dapat ditampilkan tanpa input key. Dengan demikian, konten yang sama dapat dibaca secara publik; jangan gunakan untuk data rahasia. Simpan `storage/keys/private.pem` sebagai rahasia dan buat cadangan di lokasi aman. Jangan menimpa atau membuat ulang pasangan kunci setelah konten disimpan.
 
 ## Pengujian
 
@@ -46,10 +42,3 @@ php tests/crypto_test.php
 ```
 
 Kode program yang digunakan untuk laporan tugas berada di folder `app/`, `public/`, `views/`, `scripts/`, dan `database/`.
-
-Untuk melihat nilai terenkripsi langsung di HeidiSQL/phpMyAdmin, jalankan query baca-saja berikut setelah menyimpan konten:
-
-```sql
-SELECT id, ciphertext, nonce, auth_tag, wrapped_key
-FROM admin_contents;
-```

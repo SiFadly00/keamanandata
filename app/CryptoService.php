@@ -4,23 +4,41 @@ declare(strict_types=1);
 final class CryptoService
 {
     private OpenSSLAsymmetricKey $publicKey;
-    private OpenSSLAsymmetricKey $privateKey;
+    private ?OpenSSLAsymmetricKey $privateKey = null;
 
-    public function __construct(string $publicKeyPath, string $privateKeyPath)
+    public function __construct(string $publicKeyPath)
     {
-        if (!is_file($publicKeyPath) || !is_file($privateKeyPath)) {
+        if (!is_file($publicKeyPath)) {
             throw new RuntimeException(
-                'Kunci RSA belum tersedia. Jalankan: php scripts/generate_keys.php'
+                'Kunci publik RSA belum tersedia. Jalankan: php scripts/generate_keys.php'
             );
         }
 
         $publicKey = openssl_pkey_get_public((string) file_get_contents($publicKeyPath));
-        $privateKey = openssl_pkey_get_private((string) file_get_contents($privateKeyPath));
-        if ($publicKey === false || $privateKey === false) {
-            throw new RuntimeException('Kunci RSA tidak dapat dibaca. Periksa file di storage/keys.');
+        if ($publicKey === false) {
+            throw new RuntimeException('Kunci publik RSA tidak dapat dibaca. Periksa file di storage/keys.');
         }
 
         $this->publicKey = $publicKey;
+    }
+
+    public function unlock(string $privateKeyPem): void
+    {
+        $privateKey = openssl_pkey_get_private(trim($privateKeyPem));
+        if ($privateKey === false) {
+            throw new RuntimeException('Private key tidak valid atau tidak dapat dibaca.');
+        }
+
+        $privateDetails = openssl_pkey_get_details($privateKey);
+        $publicDetails = openssl_pkey_get_details($this->publicKey);
+        if ($privateDetails === false
+            || $publicDetails === false
+            || !isset($privateDetails['key'], $publicDetails['key'])
+            || !hash_equals($publicDetails['key'], $privateDetails['key'])
+        ) {
+            throw new RuntimeException('Private key tidak cocok dengan pasangan kunci aplikasi.');
+        }
+
         $this->privateKey = $privateKey;
     }
 
@@ -132,6 +150,10 @@ final class CryptoService
      */
     public function decryptRecord(array $encrypted): array
     {
+        if ($this->privateKey === null) {
+            throw new RuntimeException('Masukkan private key untuk membuka konten.');
+        }
+
         $ciphertext = base64_decode($encrypted['ciphertext'], true);
         $nonce = base64_decode($encrypted['nonce'], true);
         $tag = base64_decode($encrypted['auth_tag'], true);

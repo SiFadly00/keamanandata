@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var list<array<string, int|string>> $contents
+ * @var string|null $notice
+ * @var string $error
+ */
+?>
 <!doctype html>
 <html lang="id">
 <head>
@@ -10,11 +17,11 @@
     <header class="topbar">
         <a class="brand" href="index.php"><span class="brand-mark brand-mark-small" aria-hidden="true">RA</span><span>Ruang Aman</span></a>
         <div class="topbar-right">
-            <span class="user-label"><span class="status-dot" aria-hidden="true"></span><?= h((string) $adminUsername) ?></span>
+            <span class="user-label"><span class="status-dot" aria-hidden="true"></span>Data terbuka</span>
             <form method="post">
                 <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
-                <input type="hidden" name="action" value="logout">
-                <button class="button button-quiet" type="submit">Keluar</button>
+                <input type="hidden" name="action" value="lock">
+                <button class="button button-quiet" type="submit">Kunci data</button>
             </form>
         </div>
     </header>
@@ -79,11 +86,11 @@
                     <?php foreach ($contents as $content): ?>
                         <article class="content-card">
                             <div class="content-card-top">
-                                <span class="category-tag"><?= h($content['category']) ?></span>
-                                <span class="content-date"><?= h(date('d M Y', strtotime($content['updated_at']))) ?></span>
+                                <span class="category-tag"><?= h((string) $content['category']) ?></span>
+                                <span class="content-date"><?= h(date('d M Y', strtotime((string) $content['updated_at']))) ?></span>
                             </div>
-                            <h3><?= h($content['title']) ?></h3>
-                            <p class="content-body"><?= nl2br(h($content['body'])) ?></p>
+                            <h3><?= h((string) $content['title']) ?></h3>
+                            <p class="content-body"><?= nl2br(h((string) $content['body'])) ?></p>
                             <details class="edit-details">
                                 <summary>Edit informasi</summary>
                                 <form method="post" class="stack-form edit-form">
@@ -91,35 +98,13 @@
                                     <input type="hidden" name="action" value="save">
                                     <input type="hidden" name="id" value="<?= (int) $content['id'] ?>">
                                     <label for="title-<?= (int) $content['id'] ?>">Judul</label>
-                                    <input id="title-<?= (int) $content['id'] ?>" name="title" maxlength="160" value="<?= h($content['title']) ?>" required>
+                                    <input id="title-<?= (int) $content['id'] ?>" name="title" maxlength="160" value="<?= h((string) $content['title']) ?>" required>
                                     <label for="category-<?= (int) $content['id'] ?>">Kategori</label>
-                                    <input id="category-<?= (int) $content['id'] ?>" name="category" maxlength="60" value="<?= h($content['category']) ?>" required>
+                                    <input id="category-<?= (int) $content['id'] ?>" name="category" maxlength="60" value="<?= h((string) $content['category']) ?>" required>
                                     <label for="body-<?= (int) $content['id'] ?>">Isi</label>
-                                    <textarea id="body-<?= (int) $content['id'] ?>" name="body" rows="5" maxlength="20000" required><?= h($content['body']) ?></textarea>
+                                    <textarea id="body-<?= (int) $content['id'] ?>" name="body" rows="5" maxlength="20000" required><?= h((string) $content['body']) ?></textarea>
                                     <button class="button button-primary" type="submit">Perbarui konten</button>
                                 </form>
-                            </details>
-                            <details class="cipher-details">
-                                <summary>Lihat bukti data terenkripsi</summary>
-                                <p class="cipher-caption">Nilai berikut dibaca langsung dari kolom terenkripsi di database.</p>
-                                <div class="cipher-field">
-                                    <span>Ciphertext konten (AES-256-GCM, Base64)</span>
-                                    <pre><?= h($content['ciphertext']) ?></pre>
-                                </div>
-                                <div class="cipher-field">
-                                    <span>Kunci AES terbungkus (RSA-OAEP, Base64)</span>
-                                    <pre><?= h($content['wrapped_key']) ?></pre>
-                                </div>
-                                <div class="cipher-meta">
-                                    <div class="cipher-field">
-                                        <span>Nonce</span>
-                                        <pre><?= h($content['nonce']) ?></pre>
-                                    </div>
-                                    <div class="cipher-field">
-                                        <span>Authentication tag</span>
-                                        <pre><?= h($content['auth_tag']) ?></pre>
-                                    </div>
-                                </div>
                             </details>
                             <form method="post" class="delete-form" onsubmit="return confirm('Yakin ingin menghapus informasi ini?')">
                                 <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
@@ -135,7 +120,7 @@
 
         <footer class="security-note">
             <span class="note-icon" aria-hidden="true">✓</span>
-            <p><strong>Enkripsi hibrida aktif.</strong> Isi konten dienkripsi AES-256-GCM. Kunci AES unik untuk setiap konten dienkripsi dengan kunci publik RSA; hanya server dengan kunci privat yang dapat membukanya.</p>
+            <p><strong>Enkripsi hibrida aktif.</strong> Judul, kategori, dan isi disimpan bersama dalam ciphertext AES-256-GCM. Kunci AES unik dilindungi RSA.</p>
         </footer>
     </main>
 </body>

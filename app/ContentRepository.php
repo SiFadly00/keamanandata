@@ -9,27 +9,34 @@ final class ContentRepository
     ) {
     }
 
-    /** @return list<array{id: int, title: string, category: string, body: string, ciphertext: string, nonce: string, auth_tag: string, wrapped_key: string, created_at: string, updated_at: string}> */
-    public function all(): array
+    /** @return list<array{id: int, ciphertext: string, nonce: string, auth_tag: string, wrapped_key: string, created_at: string, updated_at: string}> */
+    public function allEncrypted(): array
     {
         $statement = $this->pdo->query(
             'SELECT id, ciphertext, nonce, auth_tag, wrapped_key, created_at, updated_at
              FROM admin_contents ORDER BY updated_at DESC, id DESC'
         );
 
-        $contents = [];
-        foreach ($statement->fetchAll() as $row) {
-            $record = $this->crypto->decryptRecord($row);
-            $contents[] = [
+        return array_map(
+            static fn (array $row): array => [
                 'id' => (int) $row['id'],
-                ...$record,
                 'ciphertext' => $row['ciphertext'],
                 'nonce' => $row['nonce'],
                 'auth_tag' => $row['auth_tag'],
                 'wrapped_key' => $row['wrapped_key'],
                 'created_at' => $row['created_at'],
                 'updated_at' => $row['updated_at'],
-            ];
+            ],
+            $statement->fetchAll()
+        );
+    }
+
+    /** @return list<array{id: int, title: string, category: string, body: string, ciphertext: string, nonce: string, auth_tag: string, wrapped_key: string, created_at: string, updated_at: string}> */
+    public function allDecrypted(): array
+    {
+        $contents = [];
+        foreach ($this->allEncrypted() as $row) {
+            $contents[] = [...$row, ...$this->crypto->decryptRecord($row)];
         }
 
         return $contents;
