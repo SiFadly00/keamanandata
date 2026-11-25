@@ -65,6 +65,8 @@ h1, h2, h3, .brand { font-family: Manrope, "Segoe UI", sans-serif; }
 .login-card > .muted { margin-bottom: 30px; }
 
 .stack-form { display: flex; flex-direction: column; gap: 10px; }
+.editor-fields { min-width: 0; width: 100%; display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; border: 0; }
+.editor-fields:disabled { opacity: 1; }
 .stack-form label { margin-top: 5px; font-size: 12px; font-weight: 700; }
 .stack-form input, .stack-form textarea {
     width: 100%;
@@ -120,6 +122,7 @@ h1, h2, h3, .brand { font-family: Manrope, "Segoe UI", sans-serif; }
 .topbar-right form { margin: 0; }
 .user-label { display: flex; align-items: center; gap: 8px; color: #506159; font-size: 12px; }
 .status-dot { width: 7px; height: 7px; background: #3a9a69; border-radius: 50%; }
+.status-dot-locked { background: #c38b37; }
 
 .page-shell { width: min(1180px, calc(100% - 64px)); margin: 0 auto; padding: 48px 0 36px; }
 .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin-bottom: 30px; }
@@ -181,6 +184,33 @@ h1, h2, h3, .brand { font-family: Manrope, "Segoe UI", sans-serif; }
 .security-note p { margin: 0; color: #65756a; font-size: 11px; line-height: 1.6; }
 .security-note strong { color: #315e46; }
 
+.welcome-shell { width: min(1180px, calc(100% - 64px)); margin: 0 auto; padding: 58px 0 44px; }
+.welcome-hero { position: relative; min-height: 430px; display: grid; grid-template-columns: 1.15fr .85fr; align-items: center; gap: 36px; padding: 60px 68px; overflow: hidden; color: white; background: #123d2e; border-radius: 22px; }
+.welcome-hero::before, .welcome-hero::after { position: absolute; content: ""; border: 1px solid #ffffff12; border-radius: 50%; pointer-events: none; }
+.welcome-hero::before { width: 460px; height: 460px; top: -280px; left: 38%; }
+.welcome-hero::after { width: 620px; height: 620px; right: -310px; bottom: -420px; }
+.welcome-copy { position: relative; z-index: 1; max-width: 610px; }
+.welcome-copy .eyebrow { color: #9bd4b2; }
+.welcome-copy h1 { max-width: 580px; margin-bottom: 16px; font-size: clamp(36px, 5vw, 58px); line-height: 1.08; letter-spacing: -2.6px; }
+.welcome-description { max-width: 545px; margin-bottom: 26px; color: #d0e0d6; font-size: 14px; line-height: 1.8; }
+.welcome-button { width: auto; margin: 0; padding: 14px 19px; color: #123d2e; background: #b6e4c5; }
+.welcome-button:hover { background: #d0f0d9; }
+.welcome-hint { margin: 17px 0 0; color: #abc4b4; font-size: 10px; }
+.welcome-visual { position: relative; z-index: 1; width: min(100%, 340px); aspect-ratio: 1; justify-self: center; display: grid; place-items: center; }
+.welcome-orbit { position: absolute; border: 1px solid #a9d8b526; border-radius: 50%; }
+.orbit-outer { inset: 3%; }
+.orbit-inner { inset: 18%; border-style: dashed; }
+.welcome-lock { width: 112px; height: 112px; display: grid; place-items: center; color: #123d2e; background: #b6e4c5; border-radius: 34px; box-shadow: 0 18px 55px #071d1640; transform: rotate(-8deg); }
+.welcome-lock span { font-family: Manrope, sans-serif; font-size: 27px; font-weight: 800; transform: rotate(8deg); }
+.welcome-chip { position: absolute; padding: 9px 13px; color: #e8f6ec; background: #ffffff12; border: 1px solid #ffffff20; border-radius: 9px; font: 10px Consolas, monospace; }
+.chip-one { top: 21%; right: 0; }
+.chip-two { bottom: 20%; left: 2%; }
+.welcome-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding-top: 25px; }
+.welcome-feature { padding: 25px 24px; background: white; border: 1px solid var(--line); border-radius: 13px; }
+.feature-number { display: inline-block; margin-bottom: 17px; color: #7d9c88; font: 11px Consolas, monospace; }
+.welcome-feature h2 { margin-bottom: 8px; font-size: 16px; }
+.welcome-feature p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
 @media (max-width: 760px) {
     .topbar { height: 62px; padding: 0 20px; }
     .page-shell { width: calc(100% - 36px); padding-top: 32px; }
@@ -188,6 +218,10 @@ h1, h2, h3, .brand { font-family: Manrope, "Segoe UI", sans-serif; }
     .content-grid { grid-template-columns: 1fr; }
     .editor-panel { order: 0; }
     .content-list { order: 1; }
+    .welcome-shell { width: calc(100% - 36px); padding-top: 28px; }
+    .welcome-hero { grid-template-columns: 1fr; gap: 10px; padding: 42px 32px 26px; }
+    .welcome-visual { width: min(80%, 280px); margin-top: 10px; }
+    .welcome-features { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -197,4 +231,9 @@ h1, h2, h3, .brand { font-family: Manrope, "Segoe UI", sans-serif; }
     .user-label { font-size: 10px; }
     .page-shell { width: calc(100% - 28px); }
     .panel { padding: 19px; }
+    .welcome-shell { width: calc(100% - 28px); padding-top: 14px; }
+    .welcome-hero { min-height: 0; padding: 36px 24px 20px; border-radius: 15px; }
+    .welcome-copy h1 { font-size: 38px; letter-spacing: -1.7px; }
+    .welcome-visual { width: 75%; }
+    .welcome-feature { padding: 21px; }
 }

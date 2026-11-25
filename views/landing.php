@@ -1,52 +1,53 @@
-<?php
-/**
- * @var list<array{id: int, title: string, category: string, body: string, ciphertext: string, nonce: string, auth_tag: string, wrapped_key: string, created_at: string, updated_at: string}> $contents
- */
-?>
 <!doctype html>
 <html lang="id">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ruang Aman</title>
+    <title>Selamat datang — Ruang Aman</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <header class="topbar">
         <a class="brand" href="index.php"><span class="brand-mark brand-mark-small" aria-hidden="true">RA</span><span>Ruang Aman</span></a>
         <div class="topbar-right">
-            <a class="button button-quiet" href="index.php?page=admin">Admin</a>
+            <a class="button button-quiet" href="index.php?page=admin">Halaman admin</a>
         </div>
     </header>
 
-    <main class="page-shell">
-        <section class="page-heading">
-            <div>
-                <p class="eyebrow">INFORMASI</p>
-                <h1>Informasi terbaru</h1>
-                <p class="muted">Informasi yang tersedia saat ini.</p>
+    <main class="welcome-shell">
+        <section class="welcome-hero">
+            <div class="welcome-copy">
+                <p class="eyebrow">SELAMAT DATANG DI RUANG AMAN</p>
+                <h1>Privasi informasi, dimulai dari enkripsi.</h1>
+                <p class="welcome-description">Ruang Aman adalah demonstrasi pengelolaan informasi dengan enkripsi hibrida. Konten admin disimpan sebagai ciphertext dan hanya dapat dibuka dengan private key yang sesuai.</p>
+                <a class="button button-primary welcome-button" href="index.php?page=admin">Buka halaman admin <span aria-hidden="true">→</span></a>
+                <p class="welcome-hint">Halaman ini merupakan pengantar dan tidak menampilkan data dari database.</p>
+            </div>
+            <div class="welcome-visual" aria-hidden="true">
+                <div class="welcome-orbit orbit-outer"></div>
+                <div class="welcome-orbit orbit-inner"></div>
+                <div class="welcome-lock"><span>RA</span></div>
+                <div class="welcome-chip chip-one">AES-256-GCM</div>
+                <div class="welcome-chip chip-two">RSA-2048</div>
             </div>
         </section>
 
-        <section class="content-list" aria-label="Informasi">
-            <?php if ($contents === []): ?>
-                <div class="empty-state">
-                    <div class="empty-icon" aria-hidden="true">▤</div>
-                    <h2>Belum ada informasi</h2>
-                    <p class="muted">Informasi akan ditampilkan di sini setelah tersedia.</p>
-                </div>
-            <?php else: ?>
-                <?php foreach ($contents as $content): ?>
-                    <article class="content-card">
-                        <div class="content-card-top">
-                            <span class="category-tag"><?= h($content['category']) ?></span>
-                            <span class="content-date"><?= h(date('d M Y', strtotime($content['updated_at']))) ?></span>
-                        </div>
-                        <h2><?= h($content['title']) ?></h2>
-                        <p class="content-body"><?= nl2br(h($content['body'])) ?></p>
-                    </article>
-                <?php endforeach; ?>
-            <?php endif; ?>
+        <section class="welcome-features" aria-label="Fitur keamanan">
+            <article class="welcome-feature">
+                <span class="feature-number">01</span>
+                <h2>Enkripsi konten</h2>
+                <p>Judul, kategori, dan isi digabung lalu dienkripsi sebelum disimpan.</p>
+            </article>
+            <article class="welcome-feature">
+                <span class="feature-number">02</span>
+                <h2>Kunci unik</h2>
+                <p>Setiap record memakai kunci AES tersendiri yang dilindungi RSA.</p>
+            </article>
+            <article class="welcome-feature">
+                <span class="feature-number">03</span>
+                <h2>Akses terverifikasi</h2>
+                <p>Konten admin hanya terbuka setelah private key yang cocok diverifikasi.</p>
+            </article>
         </section>
     </main>
 </body>
